@@ -1,12 +1,15 @@
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 public class WordSearch {
 
     private String[][] letters;
     private String[] words;
     private int[][] word_start;
-    private Vector<String> direction;
+    private ArrayList<String> direction;
+    private ArrayList<Long> time;
+    private LinkedList<AtomicInteger> comparison;
     private int row = 0;
     private int col = 0;
     private int word_count = 0;
@@ -84,11 +87,17 @@ public class WordSearch {
 
     void solveWordSearch() {
         this.word_start = new int[this.word_count][2];
-        this.direction = new Vector<>();
+        this.direction = new ArrayList<>();
+        this.time = new ArrayList<>();
+        this.comparison = new LinkedList<>();
         int w = 0;
 
         for (String word : this.words) {
+            this.comparison.add(new AtomicInteger(0));
+
+            long start_time = System.nanoTime();
             checkWord(w, word);
+            this.time.add(System.nanoTime() - start_time);
             w++;
         }
     }
@@ -96,6 +105,7 @@ public class WordSearch {
     private void checkWord(int w, String word) {
         for (int i = 0; i < this.row; i++) {
             for (int j = 0; j < this.col; j++) {
+                this.comparison.getLast().incrementAndGet();
                 if (Objects.equals(this.letters[i][j], word.substring(0, 1))) {
                     String word_direction = this.findDirection(i, j, word);
                     if (word_direction != null) {
@@ -140,6 +150,7 @@ public class WordSearch {
             switch (direction) {
                 case "north" -> {
                     for (int i = 1; i < word.length(); i++) {
+                        this.comparison.getLast().incrementAndGet();
                         if (!Objects.equals(this.letters[row - i][column], word.substring(i, i + 1))) {
                             break;
                         } else if (i == word.length() - 1) {
@@ -149,6 +160,7 @@ public class WordSearch {
                 }
                 case "northeast" -> {
                     for (int i = 1; i < word.length(); i++) {
+                        this.comparison.getLast().incrementAndGet();
                         if (!Objects.equals(this.letters[row - i][column + i], word.substring(i, i + 1))) {
                             break;
                         } else if (i == word.length() - 1) {
@@ -158,6 +170,7 @@ public class WordSearch {
                 }
                 case "east" -> {
                     for (int i = 1; i < word.length(); i++) {
+                        this.comparison.getLast().incrementAndGet();
                         if (!Objects.equals(this.letters[row][column + i], word.substring(i, i + 1))) {
                             break;
                         } else if (i == word.length() - 1) {
@@ -167,6 +180,7 @@ public class WordSearch {
                 }
                 case "southeast" -> {
                     for (int i = 1; i < word.length(); i++) {
+                        this.comparison.getLast().incrementAndGet();
                         if (!Objects.equals(this.letters[row + i][column + i], word.substring(i, i + 1))) {
                             break;
                         } else if (i == word.length() - 1) {
@@ -176,6 +190,7 @@ public class WordSearch {
                 }
                 case "south" -> {
                     for (int i = 1; i < word.length(); i++) {
+                        this.comparison.getLast().incrementAndGet();
                         if (!Objects.equals(this.letters[row + i][column], word.substring(i, i + 1))) {
                             break;
                         } else if (i == word.length() - 1) {
@@ -185,6 +200,7 @@ public class WordSearch {
                 }
                 case "southwest" -> {
                     for (int i = 1; i < word.length(); i++) {
+                        this.comparison.getLast().incrementAndGet();
                         if (!Objects.equals(this.letters[row + i][column - i], word.substring(i, i + 1))) {
                             break;
                         } else if (i == word.length() - 1) {
@@ -194,6 +210,7 @@ public class WordSearch {
                 }
                 case "west" -> {
                     for (int i = 1; i < word.length(); i++) {
+                        this.comparison.getLast().incrementAndGet();
                         if (!Objects.equals(this.letters[row][column - i], word.substring(i, i + 1))) {
                             break;
                         } else if (i == word.length() - 1) {
@@ -203,6 +220,7 @@ public class WordSearch {
                 }
                 case "northwest" -> {
                     for (int i = 1; i < word.length(); i++) {
+                        this.comparison.getLast().incrementAndGet();
                         if (!Objects.equals(this.letters[row - i][column - i], word.substring(i, i + 1))) {
                             break;
                         } else if (i == word.length() - 1) {
@@ -211,12 +229,78 @@ public class WordSearch {
                     }
                 }
             }
-        } catch (IndexOutOfBoundsException ignored) {}
+        } catch (IndexOutOfBoundsException ignored) {
+            // Loop exits and returns
+        }
 
         return correct_direction;
     }
     
     void displaySolutions() {
+        String[][] solution = new String[this.row][this.col];
         
+        for (int i = 0; i < this.word_count; i++) {
+            for (int j = 0; j < this.row; j++) {
+                for (int k = 0; k < this.col; k++) {
+                    solution[j][k] = "-";
+                }
+            }
+
+            switch (this.direction.get(i)) {
+                case "north" -> {
+                    for (int j = 0; j < this.words[i].length(); j++) {
+                        solution[this.word_start[i][0] - j][this.word_start[i][1]] = this.words[i].substring(j, j + 1);
+                    }
+                }
+                case "northeast" -> {
+                    for (int j = 0; j < this.words[i].length(); j++) {
+                        solution[this.word_start[i][0] - j][this.word_start[i][1] + j] = this.words[i].substring(j, j + 1);
+                    }
+                }
+                case "east" -> {
+                    for (int j = 0; j < this.words[i].length(); j++) {
+                        solution[this.word_start[i][0]][this.word_start[i][1] + j] = this.words[i].substring(j, j + 1);
+                    }
+                }
+                case "southeast" -> {
+                    for (int j = 0; j < this.words[i].length(); j++) {
+                        solution[this.word_start[i][0] + j][this.word_start[i][1] + j] = this.words[i].substring(j, j + 1);
+                    }
+                }
+                case "south" -> {
+                    for (int j = 0; j < this.words[i].length(); j++) {
+                        solution[this.word_start[i][0] + j][this.word_start[i][1]] = this.words[i].substring(j, j + 1);
+                    }
+                }
+                case "southwest" -> {
+                    for (int j = 0; j < this.words[i].length(); j++) {
+                        solution[this.word_start[i][0] + j][this.word_start[i][1] - j] = this.words[i].substring(j, j + 1);
+                    }
+                }
+                case "west" -> {
+                    for (int j = 0; j < this.words[i].length(); j++) {
+                        solution[this.word_start[i][0]][this.word_start[i][1] - j] = this.words[i].substring(j, j + 1);
+                    }
+                }
+                case "northwest" -> {
+                    for (int j = 0; j < this.words[i].length(); j++) {
+                        solution[this.word_start[i][0] - j][this.word_start[i][1] - j] = this.words[i].substring(j, j + 1);
+                    }
+                }
+            }
+
+            for (int j = 0; j < this.row; j++) {
+                for (int k = 0; k < col; k++) {
+                    System.out.printf("%s ", solution[j][k]);
+                    if (j != this.row - 1 && k == this.col - 1) {
+                        System.out.println();
+                    }
+                }
+            }
+            System.out.println();
+            System.out.printf("Comparison done: %s\n", this.comparison.get(i));
+            System.out.printf("Time elapsed: %d ns\n", this.time.get(i));
+            System.out.println();
+        }
     }
 }
