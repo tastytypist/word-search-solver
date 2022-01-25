@@ -3,6 +3,9 @@ import java.util.*;
 import java.util.concurrent.atomic.*;
 
 public class WordSearch {
+    
+    private static final String[] valid_direction =
+            {"north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"};
 
     private String[][] letters;
     private String[] words;
@@ -27,16 +30,14 @@ public class WordSearch {
             Scanner file_input = new Scanner(file);
 
             while (file_input.hasNextLine()) {
+                String word_search_row = file_input.nextLine();
                 if (this.row == 0) {
-                    String word_search_row = file_input.nextLine();
                     String[] array_row = word_search_row.split(" ");
                     this.col = array_row.length;
-                }
-                this.row += 1;
-                String word_search_row = file_input.nextLine();
-                if (Objects.equals(word_search_row, "")) {
+                } else if (Objects.equals(word_search_row, "")) {
                     break;
                 }
+                this.row += 1;
             }
 
             while (file_input.hasNextLine()) {
@@ -122,22 +123,11 @@ public class WordSearch {
     private String findDirection(int row, int column, String word) {
         String direction = null;
 
-        if (this.tryDirection("north", row, column, word)) {
-            direction = "north";
-        } else if (this.tryDirection("northeast", row, column, word)) {
-            direction = "northeast";
-        } else if (this.tryDirection("east", row, column, word)) {
-            direction = "east";
-        } else if (this.tryDirection("southeast", row, column, word)) {
-            direction = "southeast";
-        } else if (this.tryDirection("south", row, column, word)) {
-            direction = "south";
-        } else if (this.tryDirection("southwest", row, column, word)) {
-            direction = "southwest";
-        } else if (this.tryDirection("west", row, column, word)) {
-            direction = "west";
-        } else if (this.tryDirection("northwest", row, column, word)) {
-            direction = "northwest";
+        for (String dir: valid_direction) {
+            if (this.tryDirection(dir, row, column, word)) {
+                direction = dir;
+                break;
+            }
         }
 
         return direction;
