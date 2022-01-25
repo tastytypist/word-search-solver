@@ -2,6 +2,10 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
+/**
+ * The {@code WordSearch} class represents the word search puzzle being
+ * solved by the program.
+ */
 public class WordSearch {
     
     private static final String[] valid_direction =
@@ -17,6 +21,10 @@ public class WordSearch {
     private int col = 0;
     private int word_count = 0;
 
+    /**
+     * Creates a new {@code WordSearch} object from an input file.
+     * @param file_name The name of the file containing the word search puzzle
+     */
     void inputWordSearch(String file_name) {
         String suffix = ".txt";
 
@@ -69,6 +77,9 @@ public class WordSearch {
         }
     }
 
+    /**
+     * Displays a {@code WordSearch} object into the terminal.
+     */
     void displayWordSearch() {
         for (int i = 0; i < this.row; i++) {
             for (int j = 0; j < this.col; j++) {
@@ -86,6 +97,10 @@ public class WordSearch {
         System.out.println();
     }
 
+    /**
+     * Solves a {@code WordSearch} object and stores its solutions on its attributes.
+     * A brute force approach is used by this method.
+     */
     void solveWordSearch() {
         this.word_start = new int[this.word_count][2];
         this.direction = new ArrayList<>();
@@ -103,6 +118,12 @@ public class WordSearch {
         }
     }
 
+    /**
+     * Checks whether a letter in the word search puzzle matches with the first
+     * letter of the word being searched.
+     * @param w Index location in which the solution will be stored
+     * @param word The word being searched
+     */
     private void checkWord(int w, String word) {
         for (int i = 0; i < this.row; i++) {
             for (int j = 0; j < this.col; j++) {
@@ -120,6 +141,14 @@ public class WordSearch {
         }
     }
 
+    /**
+     * Tests for all possible direction the word being searched might be
+     * oriented in the puzzle.
+     * @param row The number of row in the word search puzzle
+     * @param column The number of column in the word search puzzle
+     * @param word The word being searched
+     * @return The word's orientation or {@code null} if the word is not found
+     */
     private String findDirection(int row, int column, String word) {
         String direction = null;
 
@@ -133,6 +162,16 @@ public class WordSearch {
         return direction;
     }
 
+    /**
+     * Tests for a potential direction the word is possibly oriented in the
+     * puzzle
+     * @param direction The potential direction being tested
+     * @param row The number of row in the word search puzzle
+     * @param column The number of column in the word search puzzle
+     * @param word The word being searched
+     * @return {@code true} if the word is found in the direction and {@code false}
+     * otherwise
+     */
     private boolean tryDirection(String direction, int row, int column, String word) {
         boolean correct_direction = false;
 
@@ -225,11 +264,15 @@ public class WordSearch {
 
         return correct_direction;
     }
-    
+
+    /**
+     * Displays the {@code WordSearch} object's solutions on the terminal
+     */
     void displaySolutions() {
         String[][] solution = new String[this.row][this.col];
         
         for (int i = 0; i < this.word_count; i++) {
+            System.out.println("----------------------------------------");
             for (int j = 0; j < this.row; j++) {
                 for (int k = 0; k < this.col; k++) {
                     solution[j][k] = "-";

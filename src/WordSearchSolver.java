@@ -1,3 +1,7 @@
+/**
+ * The {@code WordSearchSolver} class represents the solver program being
+ * used to solve a word search puzzle.
+ */
 public class WordSearchSolver {
 
     public static void main(String[] args) {
