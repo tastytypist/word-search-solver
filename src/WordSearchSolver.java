@@ -1,8 +1,4 @@
-import java.util.*;
-
 public class WordSearchSolver {
-
-    static Scanner input = new Scanner(System.in);
 
     public static void main(String[] args) {
         System.out.println("Welcome to Word Search Solver!\n");
